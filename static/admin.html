@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FF Visit Ops — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<div class="scanlines"></div>
+
+<div class="app">
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>FF<span>OPS</span></h1>
+        <p>Visit Sender</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-view="sender">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span>Visit Sender</span>
+      </a>
+      <a class="nav-item" data-view="history">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>History</span>
+        <!-- <span class="badge" id="history-badge">0</span> -->
+      </a>
+      <a class="nav-item" data-view="tokens">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3"/></svg>
+        <span>Tokens</span>
+      </a>
+      <a class="nav-item" data-view="docs">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 016.5 22H20V2H6.5A2.5 2.5 0 004 4.5v15z"/></svg>
+        <span>API Docs</span>
+      </a>
+      <a class="nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status">
+        <span class="status-dot"></span>
+        <span>System Online</span>
+      </div>
+      <p>Powered by <b>M. SARKER</b></p>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h2 id="page-title">Dashboard</h2>
+        <span class="breadcrumb">~ admin / <span id="breadcrumb-current">dashboard</span></span>
+      </div>
+      <div class="header-right">
+        <div class="clock" id="clock">00:00:00</div>
+        <div class="header-divider"></div>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="view active" id="view-dashboard">
+        <div class="hero">
+          <div class="hero-text">
+            <span class="tag">// SYSTEM READY</span>
+            <h1>Welcome back, <span class="gradient-text">Admin</span>.</h1>
+            <p>Free Fire mass visit sender — track performance, fire visits, monitor everything from one place.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" data-nav="sender">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send Visits Now
+              </button>
+              <button class="btn btn-ghost" data-nav="docs">View API Docs</button>
+            </div>
+          </div>
+          <div class="hero-art">
+            <div class="orb"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon cyan">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Total Requests</span>
+              <span class="stat-value" id="stat-total">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Successful Visits</span>
+              <span class="stat-value" id="stat-success">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Failed Visits</span>
+              <span class="stat-value" id="stat-failed">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Success Rate</span>
+              <span class="stat-value" id="stat-rate">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Recent Activity</h3>
+              <span class="panel-tag">LAST 10</span>
+            </div>
+            <div class="activity-list" id="activity-list">
+              <div class="empty">No activity yet. Fire your first batch →</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Region Breakdown</h3>
+              <span class="panel-tag">ALL TIME</span>
+            </div>
+            <div class="region-bars" id="region-bars">
+              <div class="empty">No data yet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VISIT SENDER ============ -->
+      <section class="view" id="view-sender">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Fire Mass Visits</h3>
+            <span class="panel-tag" id="server-ping">// idle</span>
+          </div>
+
+          <form id="visitForm" class="form">
+            <div class="form-row">
+              <div class="field">
+                <label for="uid">Target UID</label>
+                <input type="text" id="uid" placeholder="e.g. 1203435801" autocomplete="off" required />
+              </div>
+              <div class="field">
+                <label for="region">Region</label>
+                <select id="region">
+                  <option value="BD">BD — Bangladesh</option>
+                  <option value="IND">IND — India</option>
+                  <option value="BR">BR — Brazil</option>
+                  <option value="US">US — United States</option>
+                  <option value="SAC">SAC — South America</option>
+                  <option value="NA">NA — North America</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Quick Region</label>
+              <div class="chips" id="regionChips">
+                <button type="button" class="chip active" data-region="BD">BD</button>
+                <button type="button" class="chip" data-region="IND">IND</button>
+                <button type="button" class="chip" data-region="BR">BR</button>
+                <button type="button" class="chip" data-region="US">US</button>
+                <button type="button" class="chip" data-region="SAC">SAC</button>
+                <button type="button" class="chip" data-region="NA">NA</button>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span class="btn-label">Send 1000 Visits</span>
+                <span class="spinner" hidden></span>
+              </button>
+              <button type="reset" class="btn btn-ghost">Reset</button>
+            </div>
+          </form>
+
+          <div class="progress-wrap" id="progressWrap" hidden>
+            <div class="progress">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-meta">
+              <span id="progressText">Dispatching requests...</span>
+              <span id="progressTime">0.0s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" id="resultGrid" hidden>
+          <div class="panel player-card">
+            <div class="panel-head">
+              <h3>Target Player</h3>
+              <span class="panel-tag ok" id="resultStatus">SUCCESS</span>
+            </div>
+            <div class="player-info">
+              <div class="avatar" id="playerAvatar">?</div>
+              <div>
+                <div class="player-name" id="playerName">—</div>
+                <div class="player-uid" id="playerUid">UID —</div>
+                <div class="player-region" id="playerRegion">REGION —</div>
+              </div>
+            </div>
+            <div class="mini-stats">
+              <div><span>Success</span><b id="resSuccess">0</b></div>
+              <div><span>Failed</span><b id="resFailed">0</b></div>
+              <div><span>Total</span><b id="resTotal">0</b></div>
+            </div>
+          </div>
+
+          <div class="panel terminal">
+            <div class="panel-head">
+              <h3>Raw Response</h3>
+              <button class="mini-btn" id="copyJson">COPY</button>
+            </div>
+            <pre class="json-out" id="jsonOut">{ }</pre>
+          </div>
+        </div>
+
+        <div class="panel terminal">
+          <div class="panel-head">
+            <h3>Live Log</h3>
+            <button class="mini-btn" id="clearLog">CLEAR</button>
+          </div>
+          <div class="log" id="logConsole">
+            <div class="log-line"><span class="ts">[boot]</span> <span class="ok">FF Visit Ops ready.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ HISTORY ============ -->
+      <section class="view" id="view-history">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Request History</h3>
+            <div>
+              <button class="mini-btn" id="exportHistory">EXPORT</button>
+              <button class="mini-btn danger" id="clearHistory">CLEAR ALL</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="table" id="historyTable">
+              <thead>
+                <tr>
+                  <th>Time</th><th>UID</th><th>Region</th><th>Nickname</th>
+                  <th class="num">Success</th><th class="num">Failed</th><th class="num">Dur.</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody">
+                <tr><td colspan="7" class="empty">No history yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ TOKENS ============ -->
+      <section class="view" id="view-tokens">
+        <div class="panel">
+          <div class="panel-head"><h3>Token Files</h3><span class="panel-tag">CONFIG</span></div>
+          <p class="muted">The API picks tokens by region. Keep these files next to <code>app.py</code>.</p>
+          <div class="token-grid">
+            <div class="token-card">
+              <div class="token-file">token_ind.json</div>
+              <div class="token-desc">Used for <b>IND</b> region</div>
+              <div class="token-url">client.ind.freefiremobile.com</div>
+            </div>
+            <div class="token-card">
+              <div class="token-file">token_br.json</div>
+              <div class="token-desc">Used for <b>BR · US · SAC · NA</b></div>
+              <div class="token-url">client.us.freefiremobile.com</div>
+            </div>
+            <div class="token-card">
+              <div class="token-file">token_bd.json</div>
+              <div class="token-desc">Used for <b>BD</b> & other regions</div>
+              <div class="token-url">clientbp.ppmainecoonghj.com</div>
+            </div>
+          </div>
+          <div class="code-block">
+<span class="c">// Expected format</span>
+[
+  { <span class="s">"token"</span>: <span class="s">"YOUR_ACCESS_TOKEN_1"</span> },
+  { <span class="s">"token"</span>: <span class="s">"YOUR_ACCESS_TOKEN_2"</span> }
+]
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DOCS ============ -->
+      <section class="view" id="view-docs">
+        <div class="panel">
+          <div class="panel-head"><h3>API Reference</h3><span class="panel-tag">v2.0</span></div>
+
+          <div class="endpoint">
+            <span class="method get">GET</span>
+            <code>/visit?uid={uid}&region={region}</code>
+          </div>
+
+          <h4>Query Parameters</h4>
+          <table class="table">
+            <thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>uid</code></td><td>integer</td><td>yes</td><td>Free Fire player UID</td></tr>
+              <tr><td><code>region</code></td><td>string</td><td>yes</td><td>BD · IND · BR · US · SAC · NA</td></tr>
+            </tbody>
+          </table>
+
+          <h4>Example Response</h4>
+          <div class="code-block">
+{
+  <span class="s">"fail"</span>: <span class="n">0</span>,
+  <span class="s">"level"</span>: <span class="n">60</span>,
+  <span class="s">"likes"</span>: <span class="n">23783</span>,
+  <span class="s">"nickname"</span>: <span class="s">"— Ꮓᴏʙᴀʏᴀʀㅤ모⠏"</span>,
+  <span class="s">"region"</span>: <span class="s">"bd"</span>,
+  <span class="s">"success"</span>: <span class="n">1000</span>,
+  <span class="s">"uid"</span>: <span class="n">1203435801</span>
+}
+          </div>
+
+          <div class="try-it">
+            <input type="text" id="tryUid" placeholder="Try UID..." />
+            <select id="tryRegion">
+              <option>BD</option><option>IND</option><option>BR</option><option>US</option><option>SAC</option><option>NA</option>
+            </select>
+            <button class="btn btn-primary" id="tryBtn">Try It</button>
+          </div>
+          <pre class="json-out" id="tryOut">{ }</pre>
+        </div>
+      </section>
+
+      <!-- ============ SETTINGS ============ -->
+      <section class="view" id="view-settings">
+        <div class="panel">
+          <div class="panel-head"><h3>Preferences</h3></div>
+          <div class="setting">
+            <div>
+              <div class="setting-title">Dark / Light Theme</div>
+              <div class="setting-desc">Switch the panel appearance.</div>
+            </div>
+            <button class="btn btn-ghost" id="themeBtn">Toggle</button>
+          </div>
+          <div class="setting">
+            <div>
+              <div class="setting-title">Matrix Rain</div>
+              <div class="setting-desc">Animated code rain in background.</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="matrixToggle" checked><span></span></label>
+          </div>
+          <div class="setting">
+            <div>
+              <div class="setting-title">Scanlines</div>
+              <div class="setting-desc">Retro CRT overlay.</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="scanToggle" checked><span></span></label>
+          </div>
+          <div class="setting">
+            <div>
+              <div class="setting-title">Danger Zone</div>
+              <div class="setting-desc">Clear all local data (history & settings).</div>
+            </div>
+            <button class="btn btn-danger" id="wipeBtn">Wipe Data</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
